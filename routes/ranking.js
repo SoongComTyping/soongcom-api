@@ -13,6 +13,7 @@ router.get('/list', async(req, res, next) => {
     const rankingList = await Ranking.findAll({
         where: {script: script},
         attributes:['script', 'nickname', 'score', 'date'],
+        order: [['score', 'DESC']],
         raw: true,
     });
     if(rankingList){
