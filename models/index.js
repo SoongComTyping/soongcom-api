@@ -4,6 +4,8 @@ const Sequelize = require('sequelize');
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
+const Ranking = require('./ranking');
+
 const db = {};
 
 var sequelize;
@@ -14,5 +16,11 @@ if (config.use_env_variable) {
 }
 
 db.sequelize = sequelize;
+
+db.Ranking = Ranking;
+
+Ranking.init(sequelize);
+
+Ranking.associate(db);
 
 module.exports = db;
