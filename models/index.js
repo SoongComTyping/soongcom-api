@@ -5,6 +5,7 @@ const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 
 const Ranking = require('./ranking');
+const Script = require('./script');
 
 const db = {};
 
@@ -18,9 +19,12 @@ if (config.use_env_variable) {
 db.sequelize = sequelize;
 
 db.Ranking = Ranking;
+db.Script = Script;
 
 Ranking.init(sequelize);
+Script.init(sequelize);
 
 Ranking.associate(db);
+Script.associate(db);
 
 module.exports = db;

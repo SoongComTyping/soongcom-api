@@ -1,20 +1,22 @@
 const Sequelize = require('sequelize');
 
-module.exports = class Ranking extends Sequelize.Model {
+module.exports = class Script extends Sequelize.Model {
     static init(sequelize){
         return super.init({
-            script_id: {
+            id: {
                 type: Sequelize.INTEGER.UNSIGNED,
                 allowNull: false,
+                autoIncrement: true,
                 primaryKey: true,
             },
-            nickname:{
-                type: Sequelize.STRING(20),
+            name:{
+                type: Sequelize.STRING(50),
                 allowNull: false,
-                primaryKey: true,
+                primaryKey: false,
             },
-            score: {
-                type: Sequelize.INTEGER.UNSIGNED,
+            //contents는 medium text type이다.
+            content: {
+                type: Sequelize.TEXT,
                 allowNull: false,
             },
             date: {
@@ -26,8 +28,8 @@ module.exports = class Ranking extends Sequelize.Model {
                 sequelize,
                 timestamps: false,
                 underscored: false,
-                modelName: 'ranking',
-                tableName: 'ranking',
+                modelName: 'script',
+                tableName: 'script',
                 paranoid: false,
                 charset: 'utf8',
                 collate: 'utf8_general_ci',
@@ -36,6 +38,6 @@ module.exports = class Ranking extends Sequelize.Model {
     static associate(db){
         //foreign key 설정같은거 여기에다가 넣으면 된다.
         //EX) 유저 정보 백업 테이블
-        db.Ranking.belongsTo(db.Script, { foreignKey: "script_id", targetKey: "id"});
+        db.Script.hasMany(db.Ranking, {foreignKey: 'script_id', sourceKey: 'id'});
     }
-}
+};
