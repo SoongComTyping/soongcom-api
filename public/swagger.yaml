@@ -1,60 +1,51 @@
 swagger: "2.0"
 info:
-  description: "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
-  version: "1.0.0"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
+  description: "숭컴 타자 연습(독수리 타법) REST API 서버 문서입니다. "
+  version: "0.1.0"
+  title: "SoongCom Typing API"
   contact:
-    email: "apiteam@swagger.io"
+    email: "jimmy9711@naver.com"
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
-tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
+    name: "NginX"
+    url: "http://nginx.org/LICENSE"
+host: "soongcom.kro.kr"
+basePath: "/"
+
+
 schemes:
 - "https"
 - "http"
 paths:
-  /rank:
+  /ranking/script:
     get:
       tags:
       - "ranking"
-      summary: "Script별 랭킹 리스트 전송"
-      description: "list 전송 router"
-      operationId: "rankg operationId"
+      summary: "각 Script별 랭킹 목록을 전송"
+      description: " "
+      operationId: "넌어디에있니"
       consumes:
       - "application/json"
-      produces:
-      - "application/xml"
       parameters:
-      - in: "query"
-        name: "script"
-        description: "Script 이름을 받아 해당 Script의 랭킹을 전송"
-        required: true
-        schema:
-          $ref: ""
-        responses:
-          "200"
-          "405":
-            description: "잘못된 Script Name"
+        -name: "script_id"
+         in: "body"
+          name: "body"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Ranking"
+        "405":
+          description: "Invalid input"
+      #security:
+      #- auth:
+      #  - "추후 로그인 기능 구현 이후 추가 예정"
       
   /pet:
     post:
       tags:
-      - "pet"
+      - "ranking"
       summary: "Add a new pet to the store"
       description: ""
       operationId: "addPet"
@@ -401,11 +392,194 @@ paths:
           description: "Invalid ID supplied"
         "404":
           description: "Order not found"
-  
-          
-          
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+  /user/createWithArray:
+    post:
+      tags:
+      - "user"
+      summary: "Creates list of users with given input array"
+      description: ""
+      operationId: "createUsersWithArrayInput"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List of user object"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+  /user/createWithList:
+    post:
+      tags:
+      - "user"
+      summary: "Creates list of users with given input array"
+      description: ""
+      operationId: "createUsersWithListInput"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List of user object"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+  /user/login:
+    get:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "string"
+          headers:
+            X-Rate-Limit:
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+        "400":
+          description: "Invalid username/password supplied"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /user/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by user name"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Invalid username supplied"
+        "404":
+          description: "User not found"
+    put:
+      tags:
+      - "user"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        "400":
+          description: "Invalid user supplied"
+        "404":
+          description: "User not found"
+    delete:
+      tags:
+      - "user"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        "400":
+          description: "Invalid username supplied"
+        "404":
+          description: "User not found"
 securityDefinitions:
-  petstore_auth:
+  auth:
     type: "oauth2"
     authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
     flow: "implicit"
@@ -417,33 +591,40 @@ securityDefinitions:
     name: "api_key"
     in: "header"
 definitions:
-  Order:
+  Contents:
     type: "object"
     properties:
       id:
         type: "integer"
         format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
+      content_name:
+        type: "string"
+      content_info:
+        type: "string"
+      thumbnail:
         type: "string"
         format: "date-time"
-      status:
+      category:
         type: "string"
         description: "Order Status"
         enum:
         - "placed"
         - "approved"
         - "delivered"
-      complete:
+      recommend:
         type: "boolean"
         default: false
+      days:
+        type: "integer"
+        format: "int64"
+      total_time:
+        type: "integer"
+        format: "int64"
+      createdAt:
+        type: "string"
+        format: "date-time"
     xml:
-      name: "Order"
+      name: "Contents"
   Category:
     type: "object"
     properties:
@@ -526,26 +707,20 @@ definitions:
     xml:
       name: "Pet"
       
-      
-      
-  Ranking:
+  Words:
     type: "object"
     required:
-    - "nickname"
-    - "score"
+    - "word"
     properties:
-      script_id:
-        $ref: "#/definitions/Script"
-      nickname:
-        type: "string"
-      score:
+      id:
         type: "integer"
-        format: "int64"
-      date:
+        format: "int(11)"
+      word:
         type: "string"
-        format: "time-stamp"
-    xml:
-      name: "Ranking"
+        format: "varchar(20)"
+      type:
+        type: "string"
+        format: "varchar(5)"
   Script:
     type: "object"
     required:
@@ -555,20 +730,33 @@ definitions:
       id:
         type: "integer"
         format: "int64"
+        description: "Ranking table의 foreign key"
       name:
         type: "string"
+        format: "varchar(50)"
       content:
         type: "string"
+        format: "longtext"
       date:
         type: "string"
         format: "time-stamp"
-    xml:
-      name: "Script"
-      
-      
-      
-      
-      
+  Ranking:
+    type: "object"
+    required:
+    - "script_id"
+    - "nickname"
+    - "score"
+    properties:
+      script_id :
+        $ref: "#/definitions/Script"
+      nickname:
+        type: "string"
+      score: 
+        type: "integer"
+        format: "int64"
+      date:
+        type: "string"
+        format: "time-stamp"
   ApiResponse:
     type: "object"
     properties:
