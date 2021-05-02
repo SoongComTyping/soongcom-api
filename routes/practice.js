@@ -1,29 +1,30 @@
 const express = require('express');
-const Ranking = require('../models/ranking');
+const { sequelize } = require('../models');
+const Word = require('../models/words');
 
 const router = express.Router();
 
-/*
-router.get('/list', async(req, res, next) => {
-  console.log("랭킹 리스트 전송");
+
+router.get('/words', async(req, res, next) => {
+  
   var result = new Object();
-  var script = req.query.script;
 
   try{
-    const rankingList = await Ranking.findAll({
-        where: {script: script},
-        attributes:['script', 'nickname', 'score', 'date'],
-        order: [['score', 'DESC']],
+    const words = await Word.findAll({
+        attributes:['word'],
+        order: sequelize.random(),
+        //전송할 단어 개수는 여기서 처리
+        limit: 50,
         raw: true,
     });
-    if(rankingList){
-        console.log(rankingList);
+    if(words){
+        console.log(words);
         result.error = false;
-        result.list = rankingList;
+        result.words = words;
         res.send(result);
     }else{
         result.error = true;
-        console.error("해당하는 스크립트가 존재하지 않습니다.");
+        console.error("단어 조회에 실패했습니다.");
         res.send(result);
     }
     
@@ -33,7 +34,7 @@ router.get('/list', async(req, res, next) => {
     res.send(result);
   }
 });
-*/
+
 
   
 module.exports = router;
