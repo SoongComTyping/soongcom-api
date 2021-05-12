@@ -1,9 +1,11 @@
 const express = require('express');
+//socket 정보 확인을 위해 세션 사용
+const express =require('express-session');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const path = require('path');
-const fs = require('fs');
-
+const nunjucks = require('nunjucks');
+const ColorHash = require('color-hash');
 
 const { sequelize } = require('./models');
 
@@ -12,13 +14,18 @@ const { sequelize } = require('./models');
 dotenv.config();
 //라우터 선언 
 const mainRouter = require('./routes');
-
+const webSocket = require('./socket');
 const app = express();
 
 //실행될 포트 지정
 //배포 실행 시 3000번, 개발 모드 진입 시 3001번
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3001);
+app.set('view engine', 'html');
 
+nunjucks.configure('views', {
+        express: app,
+        watch: true,
+});
 sequelize.sync({ force: false })
 .then(() => {
         console.log('Mysql DB 연결 성공');
@@ -49,6 +56,23 @@ app.use(express.json());
 //객체 형태 데이터의 중첩을 허용하지 않는다. 
 app.use(express.urlencoded({ extended : false}));
 
+//socket 정보 확인을 위해 세션 사용
+app.use(session({
+        resave: false,
+        saveUninitialized: false,
+        secret: process.env.COOKIE_SECRET,
+        cookie: {
+                httpOnly: true,
+                secure: false,
+        },
+}))
+//세션 아이디별로 색깔 구분
+app.use((req,res, next) =>{
+        if(!req.session.color){
+                const colorHash = new ColorHash();
+                req.session.color = colorHash.hex(req.sessionID);
+        }
+})
 //추후 로그인 기능 구현을 위한 passport 선언 -> 안쓰일수도 있다
 //app.use(passport.initialize());
 //app.use(passport.session());
@@ -73,6 +97,8 @@ app.use((err, req, res, next) => {
 });
 
 //서버가 실행될 포트 지정
-app.listen(app.get('port'), () => {
+const server = app.listen(app.get('port'), () => {
         console.log(app.get('port'), '번 포트에서 대기중');
 });
+
+webSocket(server);

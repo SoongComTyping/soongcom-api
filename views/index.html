@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>채팅방</title>
+        <link rel="stylesheet" href="./main.css">
+    </head>
+    <body>
+        {% block contents %}
+        {% endblock %}
+        {% block script %}
+        {% endblock %}
+        <div>F12를 눌러 console탭과 network탭 확인</div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            //웹소켓 생성자에 서버 주소 입력
+            const socket = io.connect('http://soongcom.kro.kr:3001', {
+                //socket.js에서 설정한 path와 동일한 경로로 설정해야한다.
+                path: '/socket.io',
+                //socket.io는 먼저 폴링 방식으로 연결 후 웹소켓이 가능하면 웹소켓으로 업그레이드한다.
+                //transports를 websocket으로 지정하면 그러한 과정을 생략하고 웹소켓으로만 연결한다. 
+                transports: ['websocket'],
+            })
+            //클라이언트에서도 이벤트 기반으로 동작한다 -> 이벤트 리스너
+            //news라는 이벤트를 받는다.
+            socket.on('news', function(data){
+                console.log(data);
+                //reply라는 이벤트를 전송 
+                socket.emit('reply', '클라이언트에서 서버로!!!');
+            });
+        </script>
+    </body>
+</html>
