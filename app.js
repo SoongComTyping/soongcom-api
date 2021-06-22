@@ -1,11 +1,13 @@
 const express = require('express');
 //socket 정보 확인을 위해 세션 사용
-const express =require('express-session');
+const session =require('express-session');
 const morgan = require('morgan');
+const cors = require('cors');
+
 const dotenv = require('dotenv');
 const path = require('path');
 const nunjucks = require('nunjucks');
-const ColorHash = require('color-hash');
+//const ColorHash = require('color-hash');
 
 const { sequelize } = require('./models');
 
@@ -46,6 +48,7 @@ if(process.env.NODE_ENV === 'production'){
         app.use(morgan('dev'));
 }
 
+app.use(cors());
 //서버 내에 정적 경로 설정
 app.use(express.static(path.join(__dirname, 'public')));
 //이미지 소스 정적 경로 설정
@@ -57,22 +60,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended : false}));
 
 //socket 정보 확인을 위해 세션 사용
-app.use(session({
-        resave: false,
-        saveUninitialized: false,
-        secret: process.env.COOKIE_SECRET,
-        cookie: {
-                httpOnly: true,
-                secure: false,
-        },
-}))
+// app.use(session({
+//         resave: false,
+//         saveUninitialized: false,
+//         secret: process.env.COOKIE_SECRET,
+//         cookie: {
+//                 httpOnly: true,
+//                 secure: false,
+//         },
+// }))
 //세션 아이디별로 색깔 구분
-app.use((req,res, next) =>{
-        if(!req.session.color){
-                const colorHash = new ColorHash();
-                req.session.color = colorHash.hex(req.sessionID);
-        }
-})
+// app.use((req,res, next) =>{
+//         if(!req.session.color){
+//                 const colorHash = new ColorHash();
+//                 req.session.color = colorHash.hex(req.sessionID);
+//         }
+// })
 //추후 로그인 기능 구현을 위한 passport 선언 -> 안쓰일수도 있다
 //app.use(passport.initialize());
 //app.use(passport.session());
@@ -101,4 +104,4 @@ const server = app.listen(app.get('port'), () => {
         console.log(app.get('port'), '번 포트에서 대기중');
 });
 
-webSocket(server);
+// webSocket(server, app);
