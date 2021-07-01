@@ -8,7 +8,6 @@ router.use((req, res, next) => {
 
 router.get('/', async (req, res, next) => {
   //해당 url 접속시 반응 확인
-  //res.render('index');
   res.send('API Server is Running!!!!!!!!!!!!');
 });
 
